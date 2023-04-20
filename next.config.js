@@ -4,6 +4,10 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 module.exports = withBundleAnalyzer({
+  publicRuntimeConfig: {
+    openaikey: process.env.OPENAI_API_KEY,
+    basePath: process.env.BASE_PATH,
+  },
   eslint: {
     dirs: ['.'],
   },

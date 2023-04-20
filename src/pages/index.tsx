@@ -1,3 +1,4 @@
+import getConfig from 'next/config';
 import React, { useEffect, useState } from 'react';
 
 import ChatHistory from '@/components/chatHistory';
@@ -15,6 +16,11 @@ import { OpenAI } from '@/service/chatGPT';
 import { Main } from '@/templates/Main';
 import type { MessageHistory } from '@/types';
 import { ChatRole } from '@/types';
+
+const { publicRuntimeConfig } = getConfig();
+
+const OPENAI_API_KEY = publicRuntimeConfig.openaikey;
+const BASE_PATH = publicRuntimeConfig.basePath;
 
 const Chatbot: React.FC = () => {
   const [speechRecognition, setSpeechRecognition] =
@@ -119,7 +125,7 @@ const Chatbot: React.FC = () => {
   };
 
   const thinking = async () => {
-    const key = localStorage.getItem('apiKey');
+    const key = OPENAI_API_KEY;
     if (key == null) return alert('you need to set api key first!');
 
     const question: MessageHistory = {
@@ -139,6 +145,7 @@ const Chatbot: React.FC = () => {
     setResponse('');
     const api = new OpenAI({
       apiKey: key,
+      apiUrl: `https://${BASE_PATH}/v1/chat/completions`,
     });
     const text = await api.sendContextMessages({
       messages: [...history, question],
@@ -264,7 +271,7 @@ const Chatbot: React.FC = () => {
             <button
               className={`${isListening ? 'bg-red-500' : 'bg-blue-500'} ${
                 isListening ? 'hover:bg-red-700' : 'hover:bg-blue-700'
-              } focus:shadow-outline w-full rounded-full py-2 px-4 text-3xl font-bold text-white focus:outline-none`}
+              } focus:shadow-outline w-full rounded-full px-4 py-2 text-3xl font-bold text-white focus:outline-none`}
               onClick={toggleListening}
             >
               {isListening ? 'Listening..' : 'Click to Talk'}
@@ -273,7 +280,7 @@ const Chatbot: React.FC = () => {
 
           {isAiTalking && (
             <button
-              className="focus:shadow-outline ml-2 rounded-full bg-gray-300 py-2 px-4 text-3xl font-bold text-white hover:bg-gray-700 focus:outline-none"
+              className="focus:shadow-outline ml-2 rounded-full bg-gray-300 px-4 py-2 text-3xl font-bold text-white hover:bg-gray-700 focus:outline-none"
               onClick={handleMute}
             >
               Mute
